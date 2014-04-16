@@ -25,7 +25,12 @@ module Mongoid
             # get each of their individual message and add them to the parent's errors:
             if rel.errors.any?
               rel.errors.messages.each do |k, v|
-                key = (rel.metadata.relation == Mongoid::Relations::Embedded::Many ? "#{name}[#{i}].#{k}" : "#{name}.#{k}").to_sym
+                if rel.respond_to?(:metadata)
+                  key = (rel.metadata.relation == Mongoid::Relations::Embedded::Many ? "#{name}[#{i}].#{k}" : "#{name}.#{k}").to_sym
+                  warn "[DEPRECATION] Mongoid 4 has renamed metadata to relation_metadata"
+                else
+                  key = (rel.relation_metadata.relation == Mongoid::Relations::Embedded::Many ? "#{name}[#{i}].#{k}" : "#{name}.#{k}").to_sym
+                end
                 errs.delete(key)
                 errs[key] = v
                 errs[key].flatten!

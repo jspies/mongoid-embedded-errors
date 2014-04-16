@@ -25,6 +25,15 @@ describe Mongoid::EmbeddedErrors do
       })
     end
 
+    it "throws a warning for pre Mongoid 4" do
+      article.should_receive(:warn).at_least(:once)
+      invalid_page.sections << valid_section
+      invalid_page.sections << invalid_section
+      article.pages << invalid_page
+      article.annotation = invalid_annotation
+      article.should_not be_valid
+    end
+
     it "save works as before" do
       article.save.should be_false
       article.should_not be_persisted
